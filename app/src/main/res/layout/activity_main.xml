@@ -7,25 +7,25 @@
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/btnCancel"
+        android:id="@+id/btnRunTwo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="CANCEL"
+        android:text="RUN_2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btnRun"
+        app:layout_constraintStart_toEndOf="@+id/btnRunOne"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnRun"
+        android:id="@+id/btnRunOne"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:text="RUN"
+        android:text="RUN_1"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btnCancel"
+        app:layout_constraintEnd_toStartOf="@+id/btnRunTwo"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"

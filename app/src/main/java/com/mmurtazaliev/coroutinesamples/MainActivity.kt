@@ -5,29 +5,27 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import java.lang.Thread.sleep
 import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
     private val formatter = SimpleDateFormat("HH:mm:ss:SSS", Locale.getDefault())
     private val scope = CoroutineScope(Job())
 
-    private lateinit var job: Job
+    private lateinit var job1: Job
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        findViewById<Button>(R.id.btnRun).setOnClickListener { runFunc() }
-        findViewById<Button>(R.id.btnCancel).setOnClickListener { cancelFunc() }
+        findViewById<Button>(R.id.btnRunOne).setOnClickListener { runOne() }
+        findViewById<Button>(R.id.btnRunTwo).setOnClickListener { runTwo() }
     }
 
 
@@ -37,25 +35,31 @@ class MainActivity : AppCompatActivity() {
         scope.cancel()
     }
 
-    private fun runFunc() {
-        log("onRun, start")
+    private fun runOne() {
 
-        job = scope.launch {
-            log("c start")
-            var x = 0
-            while (x < 5 && isActive) {
-               delay(1000)
-                log("c ${x++} isActive=$isActive")
+        log("runOne start")
+        scope.launch {
+            log("pc start")
+            job1 = launch(start = CoroutineStart.LAZY) {
+                log("c1 start")
+                delay(3000)
+                log("c1 end")
             }
-            log("c end")
-        }
 
-        log("onRun, end")
+            val job2 = launch {
+                log("c2 start")
+                delay(1500)
+                log("c2 end")
+            }
+            log("pc wait")
+            job2.join()
+            log("pc end")
+        }
+        log("runOne end")
     }
 
-    private fun cancelFunc() {
-        log("onCancel")
-        job.cancel()
+    private fun runTwo() {
+        job1.start()
     }
 
     private fun log(text: String) {
