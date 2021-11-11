@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -20,10 +21,15 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,21 +49,15 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnRunOne).setOnClickListener { }
         findViewById<Button>(R.id.btnRunTwo).setOnClickListener { }
 
-        val scope = CoroutineScope(Dispatchers.Main + User("Masha", 100, 23))
-        scope.toLog("scope")
-
-        scope.launch {
-            this.toLog("c1")
-            launch(Dispatchers.Default) {
-                this.toLog("c2")
-                launch {
-                    this.toLog("c3")
-                }
+        val scope = CoroutineScope(Executors.newSingleThreadExecutor().asCoroutineDispatcher())
+        repeat(6) {
+            scope.launch {
+                this.toLog("c_${it}_start")
+                TimeUnit.MILLISECONDS.sleep(1000)
+                this.toLog("c_${it}_end")
             }
         }
-
     }
-
 
     override fun onDestroy() {
         super.onDestroy()
@@ -69,7 +69,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun CoroutineScope.toLog(str: String) {
-        log("{ $str job=${this.coroutineContext[Job]}, dispatcher=${this.coroutineContext[ContinuationInterceptor]}, user=${this.coroutineContext[User] ?: 0}")
+        log("{ $str dispatcher=${this.coroutineContext[ContinuationInterceptor]}")
+    }
+
+    private suspend fun getData(): String {
+        return suspendCoroutine {
+            thread {
+                TimeUnit.MILLISECONDS.sleep(2000)
+                it.resume("Data")
+            }
+        }
     }
 }
 
