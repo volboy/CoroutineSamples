@@ -7,6 +7,7 @@ import android.widget.Button
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -40,11 +41,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onRun() {
-        if (job?.isActive == true) return
         job = scope.launch {
-            this.toLog("c start")
-            btnOne.text = getData()
-            this.toLog("c end")
+            log("parent c start")
+            this.launch {
+                log("child c start")
+                delay(2000)
+                log("child c end")
+            }
+            log("parent c end")
+        }
+        scope.launch {
+            delay(500)
+            log("parent job isActive=${job?.isActive}")
+            delay(2000)
+            log("parent job isActive=${job?.isActive}")
         }
     }
 
