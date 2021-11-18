@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlin.concurrent.thread
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.ContinuationInterceptor
@@ -23,9 +24,12 @@ import kotlin.coroutines.suspendCoroutine
 class MainActivity : AppCompatActivity() {
 
     private val formatter = SimpleDateFormat("HH:mm:ss:SSS", Locale.getDefault())
-    private val scope = CoroutineScope(Dispatchers.Main)
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
     private var job: Job? = null
     private lateinit var btnOne: Button
+    private val exceptionHandler = CoroutineExceptionHandler{ context, exception ->
+        log("error handled $exception")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,21 +45,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onRun() {
-        job = scope.launch {
-            log("parent c start")
-            this.launch {
-                log("child c start")
-                delay(2000)
-                log("child c end")
+        log("onRun start")
+
+        scope.launch(exceptionHandler) {
+            try {
+                Integer.parseInt("a")
+            } catch (e: Exception) {
+                log("error $e")
             }
-            log("parent c end")
         }
-        scope.launch {
-            delay(500)
-            log("parent job isActive=${job?.isActive}")
-            delay(2000)
-            log("parent job isActive=${job?.isActive}")
-        }
+        log("onRun ")
     }
 
     private fun log(text: String) {
