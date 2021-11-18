@@ -24,11 +24,11 @@ import kotlin.coroutines.suspendCoroutine
 class MainActivity : AppCompatActivity() {
 
     private val formatter = SimpleDateFormat("HH:mm:ss:SSS", Locale.getDefault())
-    private val scope = CoroutineScope(Job() + Dispatchers.Main)
+    private val scope = CoroutineScope(Job() + Dispatchers.Default)
     private var job: Job? = null
     private lateinit var btnOne: Button
-    private val exceptionHandler = CoroutineExceptionHandler{ context, exception ->
-        log("error handled $exception")
+    private val exceptionHandler = CoroutineExceptionHandler { context, exception ->
+        log("first coroutine exception $exception")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,15 +46,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun onRun() {
         log("onRun start")
-
-        scope.launch(exceptionHandler) {
-            try {
-                Integer.parseInt("a")
-            } catch (e: Exception) {
-                log("error $e")
+        scope.launch {
+            repeat(5) {
+                TimeUnit.MILLISECONDS.sleep(300)
+                log("second coroutine isActive=$isActive")
             }
         }
-        log("onRun ")
+        scope.launch(exceptionHandler) {
+            TimeUnit.MILLISECONDS.sleep(1000)
+            Integer.parseInt("a")
+        }
+        log("onRun end")
     }
 
     private fun log(text: String) {
