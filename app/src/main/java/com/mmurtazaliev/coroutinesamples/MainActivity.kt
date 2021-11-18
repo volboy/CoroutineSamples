@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.SupervisorJob
 import kotlin.concurrent.thread
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.ContinuationInterceptor
@@ -24,7 +25,7 @@ import kotlin.coroutines.suspendCoroutine
 class MainActivity : AppCompatActivity() {
 
     private val formatter = SimpleDateFormat("HH:mm:ss:SSS", Locale.getDefault())
-    private val scope = CoroutineScope(Job() + Dispatchers.Default)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var job: Job? = null
     private lateinit var btnOne: Button
     private val exceptionHandler = CoroutineExceptionHandler { context, exception ->
